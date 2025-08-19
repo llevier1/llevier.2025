@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>?🤨</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <style>
+    html,body { height: 100%; margin: 0; }
+    body {
+      display: flex; justify-content: center; align-items: center;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      background-color: #0F4C81; 
+      border: 30px solid #712D30; 
+      box-sizing: border-box;
+    }
+    img {
+      max-width: 90%;
+      max-height: 90%;
+      opacity: 0;
+      transform: scale(1);
+      transition: opacity 1s ease;
+    }
+    .show {
+      animation: zoomInOut 6s ease-in-out infinite;
+      opacity: 1 !important;
+    }
+    @keyframes zoomInOut {
+      0% { transform: scale(4.5); }
+      50% { transform: scale(6); }
+      100% { transform: scale(4.5); }
+    }
+    #gate {
+      position: fixed; inset: 0;
+      background: #000;
+      color: #fff;
+      display: flex; flex-direction: column; gap: 12px;
+      justify-content: center; align-items: center;
+      z-index: 10;
+    }
+    #gate button {
+      font-family: 'Verdana', sans-serif;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #FF6F61, #FFB86F);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    }
+    #gate button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background: linear-gradient(135deg, #FFB86F, #FF6F61);
+    }
+    #flashCircle {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      z-index: 100;
+      background: radial-gradient(circle at center,
+        #0F4C81, #712D30, #C1272D, #465A3C);
+      background-size: 200% 200%;
+      pointer-events: none;
+    }
+    .confetti {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      z-index: 200;
+    }
+  </style>
+</head>
+<body>
+  <img id="gif" src="bailando.gif" alt="GIF divertido">
+
+  <audio id="bgm" preload="auto" loop>
+    <source src="cancion.mp3" type="audio/mpeg" />
+  </audio>
+
+  <div id="gate">
+    <button id="startBtn">->CLICK ACÁ 😎<-</button>
+  </div>
+
+  <div id="flashCircle"></div>
+
+  <script>
+    const audio = document.getElementById('bgm');
+    const gate = document.getElementById('gate');
+    const gif = document.getElementById('gif');
+    const flash = document.getElementById('flashCircle');
+    const startBtn = document.getElementById('startBtn');
+    const body = document.body;
+
+    const bgColors = ['#0F4C81', '#712D30', '#C1272D', '#465A3C'];
+    const borderColors = ['#712D30', '#C1272D', '#465A3C', '#0F4C81'];
+    let colorIndex = 0;
+
+    function changeColors() {
+      colorIndex = (colorIndex + 1) % bgColors.length;
+      body.style.backgroundColor = bgColors[colorIndex];
+      body.style.border = `30px solid ${borderColors[colorIndex]}`;
+    }
+
+    let colorInterval;
+
+    function launchConfetti() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      for (let i = 0; i < 150; i++) { 
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        conf.style.top = '50%';
+        conf.style.left = '50%';
+        document.body.appendChild(conf);
+        const angle = Math.random() * 2 * Math.PI;
+        const maxDistance = Math.sqrt(width*width + height*height) / 2;
+        const distance = Math.random() * maxDistance;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+        conf.animate(
+          [
+            { transform: 'translate(-50%, -50%) translate(0,0)', opacity: 1 },
+            { transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`, opacity: 1 }
+          ],
+          { duration: 600, easing: 'ease-out', fill: 'forwards' }
+        ).onfinish = () => {
+          conf.animate(
+            [
+              { transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`, opacity: 1 },
+              { transform: `translate(-50%, -50%) translate(${x + (Math.random() - 0.5) * 200}px, ${y + 500 + Math.random()*300}px)`, opacity: 0 }
+            ],
+            { duration: 4000 + Math.random()*2000, easing: 'ease-in', fill: 'forwards' }
+          ).onfinish = () => conf.remove();
+        };
+      }
+    }
+
+    function startPage() {
+      document.title = 'Holaaaaa :D';
+      flash.style.width = '200vmax';
+      flash.style.height = '200vmax';
+      flash.style.transition = 'transform 0.5s ease-out';
+      flash.style.transform = 'translate(-50%, -50%) scale(1) rotate(180deg)';
+
+      launchConfetti();
+      colorInterval = setInterval(changeColors, 2000);
+
+      setTimeout(() => {
+        gate.style.display = 'none';
+        gif.classList.add('show');
+        audio.play().catch(err => console.log('No se pudo reproducir:', err));
+        flash.style.display = 'none';
+      }, 500);
+    }
+
+    startBtn.addEventListener('click', startPage);
+  </script>
+</body>
+</html>
+
+
+
+
